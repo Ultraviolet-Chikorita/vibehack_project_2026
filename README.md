@@ -121,12 +121,16 @@ pnpm start
 
 ## Traction data images
 
+These are placeholder slots for project traction screenshots or charts.
+
 - ![Traction chart 1](./docs/traction/traction-01.png)
 - ![Traction chart 2](./docs/traction/traction-02.png)
 - ![Traction chart 3](./docs/traction/traction-03.png)
 - ![Traction chart 4](./docs/traction/traction-04.png)
 
 ## Demo videos
+
+These are placeholder slots for demo clips or walkthrough recordings.
 
 - [Demo video 1](./docs/demo/demo-01.mp4)
 - [Demo video 2](./docs/demo/demo-02.mp4)
