@@ -131,8 +131,6 @@ These are placeholder slots for project traction screenshots or charts.
 
 ## Demo videos
 
-These are placeholder slots for demo clips or walkthrough recordings.
-
 (https://github.com/user-attachments/assets/a0f06431-e5ac-4cef-8e38-0dd71141eb87)
 
 
