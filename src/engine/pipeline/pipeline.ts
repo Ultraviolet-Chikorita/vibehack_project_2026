@@ -1,15 +1,13 @@
 /**
  * Processing pipeline (processing-pipeline.plain; spec §19).
  *
- * For every fetched message, in order:
- *   normalise → first-pass filter → classify → extract :CommerceEvent: →
- *   link to / create :OrderEvidenceVault: → store :EvidenceItem: → update
- *   :EvidenceScore: → detect :DisputeSignal: → generate :EvidencePack: when the
- *   readiness threshold is met → emit :BillingEvent:.
+ * For each fetched message, in order:
+ * normalise → filter → classify → extract :CommerceEvent: → link or create an
+ * :OrderEvidenceVault: → store :EvidenceItem: → update :EvidenceScore: → detect
+ * :DisputeSignal: → generate :EvidencePack: when ready → emit :BillingEvent:.
  *
- * Idempotent on the mailbox message identifier (external_message_id): a message
- * delivered twice is processed once, and re-processing a batch creates no
- * duplicate vaults, evidence items, or packs.
+ * Idempotent on `external_message_id`: the same message is processed once, and
+ * re-processing a batch creates no duplicate vaults, evidence items, or packs.
  */
 import {
   CommerceEvent,
@@ -62,7 +60,7 @@ export function processBatch(
     review_queue_added: 0,
   };
 
-  // Process in chronological order so evidence accumulates before a dispute.
+  // Process in chronological order so evidence accumulates before any dispute.
   const messages = [...rawMessages].sort(
     (a, b) => Date.parse(a.received_at) - Date.parse(b.received_at)
   );
@@ -70,14 +68,14 @@ export function processBatch(
   let newestProcessed: { id: string; received_at: string } | null = null;
 
   for (const raw of messages) {
-    // (0) De-duplicate by mailbox message id (idempotency).
+    // 0. De-duplicate by mailbox message id.
     if (store.hasSeenExternal(merchantId, raw.external_message_id)) {
       result.skipped_duplicates++;
       continue;
     }
     store.markSeenExternal(merchantId, raw.external_message_id);
 
-    // (1) Normalise.
+    // 1. Normalise.
     const message: SourceMessage = {
       ...raw,
       merchant_id: merchantId,
@@ -88,7 +86,7 @@ export function processBatch(
     result.processed++;
     newestProcessed = { id: message.id, received_at: message.received_at };
 
-    // (2) First-pass filter.
+    // 2. First-pass filter.
     const filter = firstPassFilter(message);
     if (!filter.relevant) {
       // Store only minimal metadata for irrelevant messages and stop.
@@ -98,18 +96,18 @@ export function processBatch(
     }
     result.relevant++;
 
-    // (3) Classify.
+    // 3. Classify.
     const { classification, confidence } = classify(message);
     store.putMessageRef(minimalRef(message, classification, confidence, true));
 
-    // (4) Extract commerce event.
+    // 4. Extract commerce event.
     const event = extractCommerceEvent(message, classification);
     store.putCommerceEvent(event);
 
-    // (5) Link to / create a vault.
+    // 5. Link to or create a vault.
     const vault = linkOrCreateVault(store, merchantId, message, event, classification, provider, result);
 
-    // (6) Store evidence item (if this classification constitutes evidence).
+    // 6. Store an evidence item when the classification counts as evidence.
     if (vault) {
       const item = evidenceItemFromEvent(event, vault.id, classification, message.subject);
       if (item && !store.hasEvidence(merchantId, vault.id, item.type, item.source_message_id)) {
@@ -117,12 +115,12 @@ export function processBatch(
         result.evidence_items_created++;
         store.putBilling(Billing.evidenceItemCaptured(merchantId, item.id));
 
-        // (7) Update evidence score for the vault.
+        // 7. Update the vault score.
         recomputeVaultScore(store, vault);
       }
     }
 
-    // (8) Detect a dispute signal.
+    // 8. Detect a dispute signal.
     const priorDisputes = event.customer_email
       ? store.listSignals(merchantId).filter((s) => signalCustomerEmail(store, merchantId, s) === event.customer_email).length
       : 0;
@@ -156,7 +154,7 @@ export function processBatch(
       store.putBilling(Billing.disputeSignalDetected(merchantId, signal.id, signal.disputed_amount, signal.currency));
 
       if (!linkedVault) {
-        // A signal matching no existing vault is queued for review, not dropped.
+        // Queue unmatched signals for review instead of dropping them.
         store.putReviewItem({
           id: nextId("review"),
           merchant_id: merchantId,
@@ -167,10 +165,10 @@ export function processBatch(
         });
         result.review_queue_added++;
       } else {
-        // (9) Generate an evidence pack for the linked signal.
+        // 9. Generate an evidence pack for the linked signal.
         const existing = store.getPackForSignal(merchantId, signal.id);
         if (!existing) {
-          recomputeVaultScore(store, linkedVault); // ensure score is current
+          recomputeVaultScore(store, linkedVault);
           const pack = generatePack({
             vault: linkedVault,
             signal,
@@ -182,7 +180,7 @@ export function processBatch(
           store.putBilling(
             Billing.evidencePackGenerated(merchantId, pack.id, signal.disputed_amount, signal.currency)
           );
-          // Reflect the dispute on the vault lifecycle status.
+          // Reflect the dispute in the vault lifecycle status.
           linkedVault.status = "disputed";
           linkedVault.last_updated = new Date().toISOString();
           store.putVault(linkedVault);
@@ -191,7 +189,7 @@ export function processBatch(
     }
   }
 
-  // (10) Emit one mailbox_scan_completed billing event for the batch.
+  // 10. Emit one mailbox_scan_completed billing event for the batch.
   if (result.processed > 0) {
     store.putBilling(
       Billing.mailboxScanCompleted(merchantId, {
@@ -203,7 +201,7 @@ export function processBatch(
     );
   }
 
-  // (11) Advance the sync cursor to the newest processed message.
+  // 11. Advance the sync cursor to the newest processed message.
   if (newestProcessed) {
     const current = store.getCursor(merchantId);
     const newer =
@@ -221,7 +219,7 @@ export function processBatch(
   return result;
 }
 
-// --- helpers ---------------------------------------------------------------
+// Helpers
 
 function minimalRef(
   message: SourceMessage,
@@ -301,7 +299,7 @@ function linkOrCreateVault(
   return null;
 }
 
-/** Build the scorer input for a vault from its evidence items and events. */
+/** Build scorer input for a vault from its evidence items and events. */
 export function buildScoringInput(store: Store, vault: OrderEvidenceVault): ScoringInput {
   const items = store.listEvidenceForVault(vault.merchant_id, vault.id);
   const events = store.listCommerceEvents(vault.merchant_id).filter((e) => e.linked_vault_id === vault.id);
@@ -356,7 +354,7 @@ function recomputeVaultScore(store: Store, vault: OrderEvidenceVault): void {
 function computeAddressMatch(addresses: string[]): AddressMatch {
   const present = addresses.map((a) => a.trim()).filter(Boolean);
   if (present.length === 0) return "absent";
-  if (present.length === 1) return "match"; // a single confirmed address, no contradiction
+  if (present.length === 1) return "match"; // Single confirmed address, no contradiction.
   const allSimilar = present.every((a) => tokenSimilarity(a, present[0]) >= 0.5);
   return allSimilar ? "match" : "mismatch";
 }
@@ -366,7 +364,7 @@ function detectConflicts(
   events: CommerceEvent[]
 ): string[] {
   const conflicts: string[] = [];
-  // Contradiction: a delivered confirmation alongside a "returned to sender" status.
+  // Contradiction: delivered confirmation alongside a "returned to sender" status.
   const delivered = items.some((i) => i.type === "tracking_delivered");
   const returned = events.some((e) => (e.delivery_status ?? "").toLowerCase().includes("returned"));
   if (delivered && returned) conflicts.push("delivery confirmed but a return-to-sender status was also seen");

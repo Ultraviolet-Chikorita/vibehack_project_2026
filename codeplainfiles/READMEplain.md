@@ -1,16 +1,16 @@
 # V1 dispute-readiness engine — `.plain` specs
 
-Spec-driven source for the **codeplain** track. These `.plain` files are the single source of truth that Codeplain renders into the backend engine. The frontend (Next.js dashboards on Vercel) and the Gmail add-on (Apps Script) sit outside Codeplain and call the engine these specs generate.
+These `.plain` files are the source of truth for the **codeplain** track. Codeplain renders them into the backend engine. The frontend (Next.js dashboards on Vercel) and the Gmail add-on (Apps Script) stay outside Codeplain and call the generated engine.
 
-## Conventions used (so the team can extend them)
+## Conventions
 
-- **Frontmatter** (`--- ... ---`): `description` + `import` directives (templates and other modules).
-- **`:Concept:`**: a Linked Definition. Each concept is defined once, in a `***definitions***` section, is globally unique, and must be defined before it is referenced. Shared concepts live in `dispute-engine-core` and are pulled in via `import`.
-- **`***functional specs***`**: each bullet becomes an auto-numbered Functional Requirement (FRID). This is what drives code generation.
-- **`***acceptance tests***`**: nested (indented) under the functional spec they verify. Codeplain turns these into conformance tests — they are why this scores on "quality of spec-driven setup."
+- **Frontmatter** (`--- ... ---`): `description` plus `import` directives for templates and modules.
+- **`:Concept:`**: a linked definition. Each concept is defined once in `***definitions***`, is globally unique, and must exist before it is referenced. Shared concepts live in `dispute-engine-core` and are imported.
+- **`***functional specs***`**: each bullet becomes an auto-numbered Functional Requirement (FRID) and drives code generation.
+- **`***acceptance tests***`**: nested under the functional spec they verify. Codeplain turns them into conformance tests.
 - Other sections used: `***implementation reqs***`, `***non-functional reqs***`.
 
-## Module map (file → spec section → owner)
+## Module map
 
 | File | Spec section | Owner |
 |---|---|---|
@@ -25,7 +25,7 @@ Spec-driven source for the **codeplain** track. These `.plain` files are the sin
 | `processing-pipeline.plain` | §19 pipeline + §18.4/18.5 sync & process endpoints | Yuvan / Manraj |
 | `app.plain` | §24/§31 end-to-end demo render (entry point) | Manraj |
 
-Each module imports `dispute-engine-core` so every shared `:Concept:` is in scope. `app.plain` imports all modules and is what you render for the full system.
+Each module imports `dispute-engine-core` so shared `:Concept:` definitions are in scope. `app.plain` imports all modules and is what you render for the full system.
 
 ## Render
 
@@ -35,18 +35,18 @@ plain2code app.plain        # generates the full engine into ./build
 
 Iterate module by module while building (faster feedback) and render `app.plain` for the integrated system.
 
-## Two things to verify against your Codeplain version
+## Verify against your Codeplain version
 
-1. **Template import.** `dispute-engine-core.plain` imports a placeholder `typescript-service-template`. Replace it with the real Standard Template Library template for your target language/stack — confirm the exact name in the Codeplain STL. (If you'd rather keep the engine in Python, swap to the matching Python service template; the functional specs and acceptance tests are language-independent.)
-2. **Multi-module imports.** `app.plain` lists every module explicitly so it works whether or not your version resolves transitive imports. If your version errors on a re-import, keep imports listed only in `app.plain`.
+1. **Template import.** `dispute-engine-core.plain` imports a placeholder `typescript-service-template`. Replace it with the real Standard Template Library template for your target language or stack; confirm the exact name in the Codeplain STL. If you keep the engine in Python, swap to the matching Python service template. The functional specs and acceptance tests are language-independent.
+2. **Multi-module imports.** `app.plain` lists every module explicitly so it works whether or not your version resolves transitive imports. If your version rejects a re-import, keep the imports only in `app.plain`.
 
 ## Why this scores on the codeplain rubric (33% spec-driven setup)
 
-- Concepts defined once and reused → no ambiguity, version-controllable.
-- Every functional requirement has acceptance tests → generated code is verified, not just produced.
-- Modules map 1:1 to system components and owners → demonstrably spec-*driven*, not prompt-driven.
-- Safety, traceability, and idempotency are encoded as requirements (read-only, source-linked claims, dedupe on message id), which is exactly the "transparent / auditable" story the pitch leans on.
+- Concepts are defined once and reused, so they stay unambiguous and version-controllable.
+- Every functional requirement has acceptance tests, so generated code is verified rather than just produced.
+- Modules map 1:1 to system components and owners, which shows the setup is spec-driven rather than prompt-driven.
+- Safety, traceability, and idempotency are encoded as requirements (read-only, source-linked claims, dedupe on message id), matching the "transparent / auditable" story in the pitch.
 
 ## Not covered here (on purpose)
 
-Frontend screens (§16) and the Apps Script add-on are built outside Codeplain. Codeplain can also render React, so if you want to push the dashboards through `.plain` too, that's a clean follow-up module set — ask and it can be generated.
+Frontend screens (§16) and the Apps Script add-on are built outside Codeplain. Codeplain can also render React, so if you want the dashboards in `.plain` too, that is a clean follow-up module set.
