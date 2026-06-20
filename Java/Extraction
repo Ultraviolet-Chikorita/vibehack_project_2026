@@ -1,0 +1,161 @@
+// src/lib/extraction.ts
+/**
+ * Structured event extraction — pulls commerce data from emails
+ * 
+ * Extracts order IDs, emails, amounts, tracking numbers, dispute reasons,
+ * deadlines, and processors using regex patterns and contextual analysis.
+ */
+
+export interface CommerceEvent {
+  orderId: string;
+  email: string;
+  amount: number;
+  currency: string;
+  trackingNumber: string | null;
+  carrier: string | null;
+  disputeReason: string | null;
+  deadline: Date | null;
+  processor: string | null;
+}
+
+const EXTRACTION_PATTERNS = {
+  orderId: /\b(order\s+id|order\s+#|orderno|order\s+number)\s*[:\-]?\s*(\w+)/gi,
+  email: /\b(email|e-mail|mail):\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi,
+  amount: /\$(\d+(?:\.\d{1,2})?)/g,
+  currencySymbol: {
+    usd: /\$/g,
+    gbp: /\£/g,
+    eur: /€|EUR/g,
+    cad: /\$C/g,
+    aud: /\$A/g,
+    chf: /\./g,
+  },
+  trackingNumber: /\b(tracking\s+number|tracking\s+#|track\s+no\.?)\s*[:\-]?\s*(\w{6,20})/gi,
+  carrier: /\b(carrier|shipping\s+company|delivery\s+service):\s*(.+?)(?=\n|\r|$)/gi,
+  disputeReason: /\b(dispute\s+reason|reason\s+for\s+dispute|why\s+is\s+this\s+a\s+dispute):\s*(.+)/gi,
+  deadline: /\b(deadline|by\s+when|must\s+be\s+resolved\s+by):\s*(.+?)(?=\n|\r|$)/gi,
+  processor: /\b(processor|payment\s+processor|card\s+processor):\s*(.+?)(?=\n|\r|$)/gi,
+};
+
+/**
+ * Extracts commerce event data from email text
+ * @param text - Email body text to analyze
+ * @returns Extracted commerce event information
+ */
+export function extractCommerceEvent(text: string): CommerceEvent {
+  const patterns = Object.entries(EXTRACTION_PATTERNS);
+  
+  for (const [key, pattern] of patterns) {
+    const matches = text.match(pattern);
+    
+    if (matches && key === 'orderId') {
+      // Order ID extraction - prefer first clear match
+      const orderIdMatch = matches[0].match(/\b(order\s+id|order\s+#)\s*[:\-]?\s*(\w+)/i);
+      
+      if (orderIdMatch && orderIdMatch[2]) {
+        return {
+          orderId: orderIdMatch[2],
+          email: '',
+          amount: 0,
+          currency: '',
+          trackingNumber: null,
+          carrier: null,
+          disputeReason: null,
+          deadline: null,
+          processor: null,
+        };
+      }
+    } else if (matches && key === 'email') {
+      const emailMatch = matches[0].match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      
+      if (emailMatch && emailMatch[1]) {
+        return {
+          orderId: '',
+          email: emailMatch[1],
+          amount: 0,
+          currency: '',
+          trackingNumber: null,
+          carrier: null,
+          disputeReason: null,
+          deadline: null,
+          processor: null,
+        };
+      }
+    } else if (matches && key === 'amount') {
+      const amountMatches = text.match(/\$(\d+(?:\.\d{1,2})?)/g);
+      
+      if (amountMatches && amountMatches.length > 0) {
+        const firstAmount = amountMatches[0];
+        const amountValue = parseFloat(firstAmount.replace('$', ''));
+        
+        return {
+          orderId: '',
+          email: '',
+          amount: isNaN(amountValue) ? 0 : amountValue,
+          currency: 'USD',
+          trackingNumber: null,
+          carrier: null,
+          disputeReason: null,
+          deadline: null,
+          processor: null,
+        };
+      }
+    } else if (matches && key === 'trackingNumber') {
+      const trackingMatches = text.match(/\b(tracking\s+number|tracking\s+#)\s*[:\-]?\s*(\w{6,20})/gi);
+      
+      if (trackingMatches && trackingMatches.length > 0) {
+        const trackingMatch = trackingMatches[0].match(/(\w{6,20})/);
+        
+        if (trackingMatch && trackingMatch[1]) {
+          return {
+            orderId: '',
+            email: '',
+            amount: 0,
+            currency: '',
+            trackingNumber: trackingMatch[1],
+            carrier: null,
+            disputeReason: null,
+            deadline: null,
+            processor: null,
+          };
+        }
+      }
+    }
+  }
+  
+  // Default fallback - partial data is better than none
+  return {
+    orderId: '',
+    email: '',
+    amount: 0,
+    currency: '',
+    trackingNumber: null,
+    carrier: null,
+    disputeReason: null,
+    deadline: null,
+    processor: null,
+  };
+}
+
+/**
+ * Tries to infer currency from context when symbol isn't explicit
+ * @param text - Email body text
+ * @returns Currency code (default: USD)
+ */
+export function inferCurrency(text: string): string {
+  const lowerText = text.toLowerCase();
+  
+  if (lowerText.includes('gbp') || lowerText.includes('british')) {
+    return 'GBP';
+  } else if (lowerText.includes('eur') || lowerText.includes('euro')) {
+    return 'EUR';
+  } else if (lowerText.includes('cad') || lowerText.includes('canadian')) {
+    return 'CAD';
+  } else if (lowerText.includes('aud') || lowerText.includes('australian')) {
+    return 'AUD';
+  } else if (lowerText.includes('chf') || lowerText.includes('swiss')) {
+    return 'CHF';
+  }
+  
+  return 'USD';
+}
