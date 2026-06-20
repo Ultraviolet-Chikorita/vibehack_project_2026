@@ -1,7 +1,7 @@
 ---
 description: 'Dispute-readiness engine — shared definitions, data model, and cross-cutting requirements'
 import:
-  - typescript-service-template   # TODO: replace with the Standard Template Library template that matches your stack — verify the exact name in `codeplain`
+  - typescript-service-template
 ---
 
 ***definitions***
