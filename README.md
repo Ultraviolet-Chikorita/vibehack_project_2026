@@ -53,6 +53,7 @@ The iOS and Android companion app designed for speed built entirely with **BILT*
 ## 🛠️ Built With Codeplain
 
 Web dashboard built using **Codeplain**. with the Front end built with **V0** and hosted on **Vercel**
+This entire ecosystem—from the web dashboard to the mobile UI—was built using **Codeplain**. 
 
 ## 🎨 Design System & UI Rules
 
