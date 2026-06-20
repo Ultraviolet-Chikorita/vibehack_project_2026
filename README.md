@@ -130,8 +130,7 @@ These are placeholder slots for project traction screenshots or charts.
 - ![Traction chart 4](./docs/traction/traction-04.png)
 
 ## Demo videos
-https://github.com/Ultraviolet-Chikorita/vibehack_project_2026/blob/main/Docs/IMG_0346.mov
-
+- (.\#/Docs/IMG_0346.mov)
 
 https://github.com/Ultraviolet-Chikorita/vibehack_project_2026/blob/main/Docs/Screen%20Recording%202026-06-20%20at%2019.50.35.mov
 
