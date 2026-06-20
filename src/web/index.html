@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>V1 — Dispute-Readiness Engine</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E🛡️%3C/text%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">🛡️</span>
+        <div>
+          <div class="brand-name">V1</div>
+          <div class="brand-sub">Dispute-Readiness Engine</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="merchant-name" class="merchant-pill">East London Camera Store</span>
+        <button id="btn-resync" class="btn btn-ghost" title="Fallback sync (spec §8.7)">↻ Resync Mailbox</button>
+        <button id="btn-reset" class="btn btn-ghost" title="Reset demo">Reset demo</button>
+      </div>
+    </header>
+
+    <!-- Onboarding (spec §6, §25 Scene 1–2) -->
+    <section id="onboarding" class="onboarding hidden">
+      <div class="onboard-card">
+        <h1>Every order, dispute-ready.</h1>
+        <p class="lede">
+          V1 connects to your mailbox, captures order &amp; fulfilment evidence automatically, and
+          generates dispute packs when chargebacks or refund claims appear — before you need them.
+        </p>
+
+        <div id="step-connect" class="onboard-step">
+          <button id="btn-link" class="btn btn-primary btn-lg">Link My Mailbox</button>
+        </div>
+
+        <div id="step-provider" class="onboard-step hidden">
+          <p class="muted">Read-only access. No SMTP, IMAP, ports, or app passwords.</p>
+          <div class="provider-row">
+            <button class="btn btn-provider" data-provider="google">Continue with Google</button>
+            <button class="btn btn-provider" data-provider="microsoft">Continue with Microsoft</button>
+          </div>
+        </div>
+
+        <div id="step-connected" class="onboard-step hidden">
+          <div class="connected-msg">
+            <span class="tick">✓</span>
+            <div>
+              <strong>Mailbox connected successfully.</strong>
+              <div class="muted">We'll start building evidence vaults from your order, fulfilment, tracking, and dispute emails.</div>
+            </div>
+          </div>
+          <button id="btn-scan" class="btn btn-primary btn-lg">Run Initial Scan</button>
+          <div id="scan-progress" class="scan-progress hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main app -->
+    <main id="app" class="app hidden">
+      <!-- Hero card (spec §16.1) -->
+      <section id="hero" class="hero-card"></section>
+
+      <!-- Metric tiles -->
+      <section id="metrics" class="metrics"></section>
+
+      <nav class="tabs">
+        <button class="tab active" data-tab="vaults">Order Vaults</button>
+        <button class="tab" data-tab="disputes">Dispute Queue</button>
+        <button class="tab" data-tab="packs">Evidence Packs</button>
+        <button class="tab" data-tab="billing">Billing &amp; Usage</button>
+        <button class="tab" data-tab="digest">Daily Digest</button>
+      </nav>
+
+      <section id="tab-vaults" class="tab-panel">
+        <div class="panel-head">
+          <h2>Order Evidence Vaults</h2>
+          <div id="vault-filters" class="filters"></div>
+        </div>
+        <div id="vaults-table"></div>
+      </section>
+
+      <section id="tab-disputes" class="tab-panel hidden">
+        <h2>Dispute Signal Queue</h2>
+        <div id="disputes-table"></div>
+      </section>
+
+      <section id="tab-packs" class="tab-panel hidden">
+        <h2>Evidence Packs</h2>
+        <div id="packs-list"></div>
+      </section>
+
+      <section id="tab-billing" class="tab-panel hidden">
+        <h2>Solvimon Usage &amp; Billing</h2>
+        <div id="billing-view"></div>
+      </section>
+
+      <section id="tab-digest" class="tab-panel hidden">
+        <h2>Daily Digest</h2>
+        <div id="digest-view"></div>
+      </section>
+    </main>
+
+    <!-- Vault / pack detail drawer -->
+    <div id="drawer" class="drawer hidden">
+      <div class="drawer-backdrop"></div>
+      <div class="drawer-panel">
+        <button class="drawer-close" id="drawer-close">✕</button>
+        <div id="drawer-content"></div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

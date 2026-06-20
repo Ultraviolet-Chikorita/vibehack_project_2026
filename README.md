@@ -39,7 +39,7 @@ graph LR
 The core web interface for merchants to manage their evidence infrastructure. Designed for deep dives, complex dispute resolution, and high-level analytics across all connected mailboxes and stores. 
 
 ### 2. V1 Mobile Companion (On-the-Go)
-The iOS and Android companion app designed for speed. 
+The iOS and Android companion app designed for speed built entirely with **BILT** 
 * **Quick-Log Shipment:** A 1-tap floating action button to log tracking details directly from the shipping counter.
 * **Push Notifications:** Instant alerts for approaching deadlines or new chargebacks.
 * **Fast Approvals:** Review and approve auto-generated evidence packs in seconds between customers.
@@ -52,6 +52,7 @@ The iOS and Android companion app designed for speed.
 
 ## 🛠️ Built With Codeplain
 
+Web dashboard built using **Codeplain**. with the Front end built with **V0** and hosted on **Vercel**
 This entire ecosystem—from the web dashboard to the mobile UI—was built using **Codeplain**. 
 
 ## 🎨 Design System & UI Rules
