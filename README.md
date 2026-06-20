@@ -131,7 +131,7 @@ These are placeholder slots for project traction screenshots or charts.
 
 ## Demo videos
 
-(https://github.com/user-attachments/assets/a0f06431-e5ac-4cef-8e38-0dd71141eb87)
+https://github.com/user-attachments/assets/a0f06431-e5ac-4cef-8e38-0dd71141eb87
 
 
 https://github.com/user-attachments/assets/013bdc11-0f93-48af-9340-9072d36ac98b
