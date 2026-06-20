@@ -1,0 +1,32 @@
+---
+description: 'Evidence pack generation — automatic dispute pack from existing vault evidence (spec §15)'
+import:
+  - dispute-engine-core
+---
+
+***definitions***
+
+- :DisputeReadinessThreshold: is the minimum :EvidenceScore: at or above which :App: generates an :EvidencePack: automatically; for a vault scoring below 60 the pack is instead marked needs_human_review.
+
+***functional specs***
+
+- :App: should generate an :EvidencePack: when a :DisputeSignal: is linked to an :OrderEvidenceVault: whose :EvidenceScore: meets :DisputeReadinessThreshold:.
+
+  ***acceptance tests***
+
+  - A :DisputeSignal: on a vault scoring 92 generates an :EvidencePack: automatically.
+  - A :DisputeSignal: on a vault scoring below 60 produces an :EvidencePack: marked needs_human_review.
+
+- :App: should include in each :EvidencePack: a dispute summary, an order summary, an evidence timeline, a captured-evidence table, missing-evidence warnings, a :Recommendation: with a confidence score, copy-paste submission text, and an attachments checklist.
+
+  ***acceptance tests***
+
+  - For an item_not_received dispute on a vault where delivery is proven, the :Recommendation: is contest.
+  - The submission text cites the order, payment, fulfilment, tracking, and delivery evidence that was captured before the dispute was opened.
+  - The :EvidencePack: separates facts from the :Recommendation: and never guarantees the outcome.
+
+- :App: should never submit an :EvidencePack: or contact a customer without explicit :Merchant: approval.
+
+  ***acceptance tests***
+
+  - No :EvidencePack: is submitted or sent until a :Merchant: approval action is recorded.

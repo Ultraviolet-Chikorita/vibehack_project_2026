@@ -1,0 +1,21 @@
+---
+description: 'Dispute signal detection — detect disputed or at-risk orders (spec §14)'
+import:
+  - dispute-engine-core
+---
+
+***functional specs***
+
+- :App: should detect a :DisputeSignal: from messages indicating any of: payment dispute, chargeback, refund request, missing item complaint, damaged item complaint, not-as-described complaint, duplicate charge complaint, repeat-claimant risk, or an unclear case needing human review.
+
+  ***acceptance tests***
+
+  - A :SourceMessage: "Stripe dispute opened: Order #1048" produces a :DisputeSignal: of type payment dispute.
+  - The :DisputeSignal: records the dispute reason, disputed amount, and deadline when present in the message.
+
+- :App: should link each :DisputeSignal: to the existing :OrderEvidenceVault: for that order.
+
+  ***acceptance tests***
+
+  - The dispute for order "1048" links to vault "1048".
+  - A :DisputeSignal: that matches no existing vault is queued for review rather than dropped.

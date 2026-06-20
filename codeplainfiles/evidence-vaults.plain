@@ -1,0 +1,37 @@
+---
+description: 'Order evidence vaults — creation and evidence linking (spec §11)'
+import:
+  - dispute-engine-core
+---
+
+***definitions***
+
+- :LinkingKeys: is the priority-ordered list of keys used to link a :SourceMessage: to an existing :OrderEvidenceVault:, namely: exact order number, then exact tracking number, then exact payment reference, then customer email with amount, then customer email with timestamp proximity, then customer name with address similarity, then product name with timestamp proximity.
+
+***functional specs***
+
+- :App: should create a new :OrderEvidenceVault: when it extracts an order_confirmation :CommerceEvent: for an order that has no existing vault.
+
+  ***acceptance tests***
+
+  - A first order_confirmation for order "1048" creates exactly one :OrderEvidenceVault:.
+  - A second order_confirmation for order "1048" does not create a duplicate vault.
+
+- :App: should link later :CommerceEvent: records to an existing :OrderEvidenceVault: using :LinkingKeys: in priority order, recording which keys matched and a link confidence between 0 and 1.
+
+  ***acceptance tests***
+
+  - A delivery email sharing the tracking number of vault "1048" links to that vault, with the matched key recorded.
+  - When two keys disagree, the higher-priority key in :LinkingKeys: decides the link.
+
+- :App: should route low-confidence links to a review queue rather than linking them automatically.
+
+  ***acceptance tests***
+
+  - A link whose confidence is below the review threshold is queued for human review and not auto-applied.
+
+- :App: should store each linked piece of evidence as an :EvidenceItem: in the :OrderEvidenceVault:, with a strength and a one-line summary.
+
+  ***acceptance tests***
+
+  - A captured delivery confirmation is stored as an :EvidenceItem: with strength strong and a summary referencing its :SourceMessage:.
