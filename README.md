@@ -1,3 +1,4 @@
+
 # Settld
 
 Settld is a dispute-evidence platform for merchants. The repo now documents the two branch lines called out for this project:
@@ -132,7 +133,9 @@ These are placeholder slots for project traction screenshots or charts.
 
 These are placeholder slots for demo clips or walkthrough recordings.
 
-- [Demo video 1](./docs/demo/demo-01.mp4)
-- [Demo video 2](./docs/demo/demo-02.mp4)
-- [Demo video 3](./docs/demo/demo-03.mp4)
-- [Demo video 4](./docs/demo/demo-04.mp4)
+(https://github.com/user-attachments/assets/a0f06431-e5ac-4cef-8e38-0dd71141eb87)
+
+
+https://github.com/user-attachments/assets/013bdc11-0f93-48af-9340-9072d36ac98b
+
+
