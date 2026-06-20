@@ -107,7 +107,7 @@ export function processBatch(
     // 5. Link to or create a vault.
     const vault = linkOrCreateVault(store, merchantId, message, event, classification, provider, result);
 
-    // 6. Store an evidence item when the classification counts as evidence.
+    // 6. Store an evidence item if one was extracted.
     if (vault) {
       const item = evidenceItemFromEvent(event, vault.id, classification, message.subject);
       if (item && !store.hasEvidence(merchantId, vault.id, item.type, item.source_message_id)) {

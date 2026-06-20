@@ -51,8 +51,7 @@ The iOS and Android companion app for fast review, built entirely with **BILT**.
 * **Explicit Approval Flow:** Never auto-submits; every dispute response pack requires explicit human review.
 
 ## 🛠️ Built With Codeplain
-The web dashboard is built with **Codeplain**, the front end uses **V0**, and it is hosted on **Vercel**.
-The full ecosystem—from the web dashboard to the mobile UI—was built using **Codeplain**.
+The web dashboard and mobile UI were built using **Codeplain**. The web dashboard's front end uses **V0** and is hosted on **Vercel**.
 
 ## 🎨 Design System & UI Rules
 

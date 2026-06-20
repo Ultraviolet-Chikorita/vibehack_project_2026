@@ -153,7 +153,7 @@ interface SyntheticOrderSpec {
     delivery: boolean;
     customerMsg: boolean;
   };
-  /** Optional dispute type: "stripe" (full pack) or "lowscore_refund" (needs_human_review). */
+  /** Optional dispute type: "stripe" (full pack) or "lowscore_refund" (thin-vault refund path, needs_human_review). */
   dispute?: "stripe" | "lowscore_refund";
 }
 

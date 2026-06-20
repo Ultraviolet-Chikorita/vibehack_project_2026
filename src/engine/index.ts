@@ -137,7 +137,10 @@ export class Engine {
     return this.store.listAccessLog(merchantId);
   }
 
-  /** Record explicit merchant approval. Nothing is submitted autonomously; the pack is only marked for merchant action. */
+  /**
+   * Record explicit merchant approval of a pack (spec §15, §21).
+   * Nothing is submitted autonomously; the pack is only marked for merchant action.
+   */
   approvePack(merchantId: string, packId: string, approvedBy = "merchant"): EvidencePack | undefined {
     const pack = this.store.getPack(merchantId, packId);
     if (!pack) return undefined;
@@ -160,7 +163,10 @@ export class Engine {
     return pack;
   }
 
-  /** Log recovered revenue for a won dispute (outcome-based billing, spec §23). Approval should already be recorded. */
+  /**
+   * Log recovered revenue for a won dispute (outcome-based billing, spec §23).
+   * Requires that the pack was approved first.
+   */
   logRecoveredRevenue(merchantId: string, packId: string, amount: number, currency = "GBP"): BillingEvent | undefined {
     const pack = this.store.getPack(merchantId, packId);
     if (!pack) return undefined;
