@@ -1,11 +1,10 @@
 /**
- * Engine facade — the public surface the server and demo call.
+ * Engine facade used by the server and demo.
  *
- * Wraps the per-merchant {@link Store} and the processing pipeline, and exposes
- * the higher-level operations required by the spec: the sync-cursor contract
- * (§18.4/§19), pack approval/override with no autonomous submission (§15, §21),
- * dashboard + digest metrics (§16), usage/invoicing (§23), and merchant data
- * deletion (§22).
+ * Wraps the per-merchant {@link Store} and processing pipeline, and exposes the
+ * higher-level operations from the spec: sync cursors (§18.4/§19), pack
+ * approval/override with no autonomous submission (§15, §21), dashboard and
+ * digest metrics (§16), usage/invoicing (§23), and merchant data deletion (§22).
  */
 import { Store } from "./core/store";
 import { nextId } from "./core/ids";
@@ -24,7 +23,7 @@ import {
 import { processBatch, ProcessResult } from "./pipeline/pipeline";
 import { aggregateUsage, Billing, computeInvoice, Invoice, PLANS, UsageSummary } from "./billing/billing";
 
-/** First sync (no cursor) instructs the client to fetch the 30 most recent messages. */
+/** First sync (no cursor) fetches the 30 most recent messages. */
 export const INITIAL_FETCH_COUNT = 30;
 
 export interface SyncCursorResponse {
@@ -56,7 +55,7 @@ export class Engine {
     this.store = store ?? new Store();
   }
 
-  // --- merchants -----------------------------------------------------------
+  // Merchants
   upsertMerchant(merchant: Merchant): Merchant {
     return this.store.upsertMerchant(merchant);
   }
@@ -67,11 +66,11 @@ export class Engine {
     return this.store.listMerchants();
   }
 
-  // --- sync contract (spec §18.4, §19) -------------------------------------
+  // Sync contract (spec §18.4, §19)
   /**
-   * Returns the current :SyncCursor: state for a merchant. On the first sync
-   * (no cursor) the client is told to fetch the 30 most recent messages; later
-   * syncs return the timestamp of the most recently processed message.
+   * Returns the current :SyncCursor: state for a merchant. First sync returns
+   * the 30 most recent messages; later syncs return the latest processed
+   * timestamp.
    */
   getSyncCursor(merchantId: string): SyncCursorResponse {
     const cursor = this.store.getCursor(merchantId);
@@ -86,17 +85,17 @@ export class Engine {
     };
   }
 
-  // --- processing ----------------------------------------------------------
+  // Processing
   process(merchantId: string, messages: SourceMessage[], provider: Merchant["mail_provider"] = "gmail"): ProcessResult {
     return processBatch(this.store, merchantId, messages, provider);
   }
 
-  /** A bounded resync / fallback scan over recent messages (spec §18.4). */
+  /** Bounded resync / fallback scan over recent messages (spec §18.4). */
   resync(merchantId: string, messages: SourceMessage[], provider: Merchant["mail_provider"] = "gmail"): ProcessResult {
     return processBatch(this.store, merchantId, messages, provider);
   }
 
-  // --- vaults / signals / packs / review ----------------------------------
+  // Vaults, signals, packs, review
   listVaults(merchantId: string): OrderEvidenceVault[] {
     return this.store.listVaults(merchantId);
   }
@@ -119,7 +118,7 @@ export class Engine {
     return this.store.listEvidenceForVault(merchantId, vaultId);
   }
 
-  /** Read a pack and log the access (spec §22: log access to evidence packs). */
+  /** Read a pack and log the access (spec §22). */
   readPack(merchantId: string, packId: string, actor = "merchant"): EvidencePack | undefined {
     const pack = this.store.getPack(merchantId, packId);
     if (pack) {
@@ -139,9 +138,8 @@ export class Engine {
   }
 
   /**
-   * Record explicit merchant approval of a pack. Nothing is ever submitted or
-   * sent autonomously; approval only marks the pack approved for the merchant to
-   * act on (spec §15, §21).
+   * Record explicit merchant approval of a pack (spec §15, §21).
+   * Nothing is submitted autonomously; the pack is only marked for merchant action.
    */
   approvePack(merchantId: string, packId: string, approvedBy = "merchant"): EvidencePack | undefined {
     const pack = this.store.getPack(merchantId, packId);
@@ -153,7 +151,7 @@ export class Engine {
     return pack;
   }
 
-  /** Merchant overrides the recommendation (e.g. choose to refund instead). */
+  /** Merchant overrides the recommendation (for example, choose refund instead). */
   overridePack(merchantId: string, packId: string, recommendation: Recommendation, by = "merchant"): EvidencePack | undefined {
     const pack = this.store.getPack(merchantId, packId);
     if (!pack) return undefined;
@@ -167,7 +165,7 @@ export class Engine {
 
   /**
    * Log recovered revenue for a won dispute (outcome-based billing, spec §23).
-   * Requires that the pack was approved first (no autonomous outcomes).
+   * Requires that the pack was approved first.
    */
   logRecoveredRevenue(merchantId: string, packId: string, amount: number, currency = "GBP"): BillingEvent | undefined {
     const pack = this.store.getPack(merchantId, packId);
@@ -177,7 +175,7 @@ export class Engine {
     return event;
   }
 
-  // --- billing -------------------------------------------------------------
+  // Billing
   listBilling(merchantId: string): BillingEvent[] {
     return this.store.listBilling(merchantId);
   }
@@ -193,7 +191,7 @@ export class Engine {
     return PLANS;
   }
 
-  // --- dashboard & digest (spec §16) --------------------------------------
+  // Dashboard and digest (spec §16)
   dashboard(merchantId: string): DashboardMetrics {
     const usage = this.usage(merchantId);
     const vaults = this.store.listVaults(merchantId);
@@ -208,7 +206,6 @@ export class Engine {
     ).length;
 
     const disputedValue = signals.reduce((sum, s) => sum + (s.disputed_amount ?? 0), 0);
-    // Estimated recoverable: disputed value backed by a contest recommendation.
     const recoverable = packs
       .filter((p) => p.recommendation === "contest")
       .reduce((sum, p) => {
@@ -231,7 +228,7 @@ export class Engine {
     };
   }
 
-  /** Daily digest text/figures (spec §16.5). */
+  /** Daily digest text and figures (spec §16.5). */
   digest(merchantId: string) {
     const d = this.dashboard(merchantId);
     const vaults = this.store.listVaults(merchantId);
@@ -253,7 +250,7 @@ export class Engine {
     };
   }
 
-  // --- data deletion (spec §22) -------------------------------------------
+  // Data deletion (spec §22)
   deleteMerchant(merchantId: string): boolean {
     return this.store.deleteMerchant(merchantId);
   }

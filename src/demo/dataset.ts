@@ -1,17 +1,17 @@
 /**
- * Hackathon demo dataset (spec §24).
+ * Hackathon demo dataset for spec §24.
  *
  * Fictional merchant: East London Camera Store (support@eastlondoncamera.example),
- * Gmail, Shopify + Stripe. Hero order #1048 — refurbished camera lens, £420,
- * dispute reason "item not received".
+ * using Gmail, Shopify, and Stripe. Hero order #1048 is a refurbished camera
+ * lens for £420 with dispute reason "item not received".
  *
  * Two builders:
- *  - {@link order1048Mailbox}: the seven seeded messages for the hero order. The
- *    pipeline turns these into a dispute_ready vault scoring 92, one dispute
- *    signal, and one auto-generated pack recommending contest at 0.82.
- *  - {@link fullDemoMailbox}: the hero order plus additional synthetic orders and
- *    noise, tuned to reproduce the §16/§25 dashboard figures (184 scanned, 39
- *    relevant, 12 vaults, 3 signals, 2 ready packs).
+ * - {@link order1048Mailbox}: the seven seeded messages for the hero order. The
+ *   pipeline turns them into a dispute_ready vault scoring 92, one dispute
+ *   signal, and one auto-generated pack recommending contest at 0.82.
+ * - {@link fullDemoMailbox}: the hero order plus synthetic orders and noise,
+ *   tuned to reproduce the §16/§25 dashboard figures (184 scanned, 39 relevant,
+ *   12 vaults, 3 signals, 2 ready packs).
  */
 import { Merchant, SourceMessage } from "../engine/core/types";
 
@@ -31,7 +31,7 @@ function msg(m: Omit<SourceMessage, "merchant_id" | "provider">): SourceMessage 
   return { merchant_id: MERCHANT_ID, provider: "gmail", ...m };
 }
 
-/** The seven seeded messages for hero order #1048 (spec §24). */
+/** Seven seeded messages for hero order #1048 (spec §24). */
 export function order1048Mailbox(): SourceMessage[] {
   return [
     msg({
@@ -135,7 +135,7 @@ export function order1048Mailbox(): SourceMessage[] {
   ];
 }
 
-// --- synthetic supporting orders (to reach the §16/§25 dashboard figures) ---
+// Synthetic supporting orders used to reach the §16/§25 dashboard figures.
 
 interface SyntheticOrderSpec {
   order: string;
@@ -144,7 +144,7 @@ interface SyntheticOrderSpec {
   product: string;
   amount: number;
   tracking: string;
-  /** Which stages to include. */
+  /** Stages to include. */
   stages: {
     order: boolean;
     payment: boolean;
@@ -153,7 +153,7 @@ interface SyntheticOrderSpec {
     delivery: boolean;
     customerMsg: boolean;
   };
-  /** Optional dispute: "stripe" (full pack), or "lowscore" (needs_human_review). */
+  /** Optional dispute type: "stripe" (full pack) or "lowscore_refund" (thin-vault refund path, needs_human_review). */
   dispute?: "stripe" | "lowscore_refund";
 }
 
@@ -260,7 +260,7 @@ function syntheticOrderMessages(spec: SyntheticOrderSpec, startIso: string): Sou
   return out;
 }
 
-/** Noise messages: irrelevant by sender/subject, counted as scanned but dropped. */
+/** Irrelevant messages counted as scanned but dropped. */
 function noiseMessages(count: number, startIso: string): SourceMessage[] {
   const subjects = [
     "Newsletter: this week's photography tips",
@@ -290,25 +290,25 @@ function noiseMessages(count: number, startIso: string): SourceMessage[] {
 }
 
 /**
- * The 11 supporting orders (order #1048 is the 12th, the hero). Tuned so the full
- * mailbox reproduces the spec §25 demo figures: 12 vaults, 39 relevant messages,
- * 7 delivery confirmations, 3 dispute signals, 2 ready packs (hero + #2005),
- * 1 needs_human_review pack (#2009), £730 disputed (420 + 200 + 110), £620
- * recoverable (the two contest packs: 420 + 200).
+ * Eleven supporting orders (order #1048 is the 12th, the hero). Tuned so the
+ * full mailbox reproduces the spec §25 demo figures: 12 vaults, 39 relevant
+ * messages, 7 delivery confirmations, 3 dispute signals, 2 ready packs (hero +
+ * #2005), 1 needs_human_review pack (#2009), £730 disputed (420 + 200 + 110),
+ * and £620 recoverable (the two contest packs: 420 + 200).
  */
 const SUPPORTING_ORDERS: SyntheticOrderSpec[] = [
-  // Second strong dispute → a fully-evidenced vault, contest pack at £200 (recoverable).
+  // Strong second dispute: fully evidenced vault, contest pack at £200.
   { ...o("2005", 200, "RN200500005GB", full5()), dispute: "stripe" },
-  // Low-value-ish refund dispute on a thin vault → needs_human_review pack, £110 (not recoverable).
+  // Thin vault with a low-value refund dispute: needs_human_review pack, £110.
   { ...o("2009", 110, "RN200900009GB", orderPayment()), dispute: "lowscore_refund" },
-  // Four delivered orders (order + payment + tracking + delivery) — delivery captured.
+  // Four delivered orders (order + payment + tracking + delivery).
   o("2001", 300, "RN200100001GB", delivered4()),
   o("2002", 180, "RN200200002GB", delivered4()),
   o("2003", 95, "RN200300003GB", delivered4()),
   o("2004", 260, "RN200400004GB", delivered4()),
   // One more delivered order (order + tracking + delivery).
   o("2010", 110, "RN201000010GB", delivered3()),
-  // Four order-only vaults — clearly missing delivery proof, surfaced to the merchant.
+  // Four order-only vaults missing delivery proof.
   o("2006", 210, "RN200600006GB", orderOnly()),
   o("2007", 130, "RN200700007GB", orderOnly()),
   o("2008", 75, "RN200800008GB", orderOnly()),
@@ -337,7 +337,7 @@ function orderOnly() {
   return stages(true, false, false, false, false);
 }
 
-/** The full demo mailbox: hero order + supporting orders + noise. */
+/** Full demo mailbox: hero order, supporting orders, and noise. */
 export function fullDemoMailbox(): SourceMessage[] {
   const messages: SourceMessage[] = [...order1048Mailbox()];
   let day = 10;

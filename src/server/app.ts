@@ -1,10 +1,10 @@
 /**
  * HTTP API for the V1 dispute-readiness engine (spec §18).
  *
- * Exposes the engine's capabilities as backend endpoints callable by the merchant
- * webapp and the Gmail add-on sync client (dispute-engine-core.plain). OAuth and
- * provider webhooks are simulated for the hackathon demo (spec §25, §29.1/§29.2),
- * with the real request/response shapes preserved.
+ * Exposes the engine as backend endpoints for the merchant web app and Gmail
+ * add-on sync client. OAuth and provider webhooks are simulated for the
+ * hackathon demo (spec §25, §29.1/§29.2), while the request/response shapes stay
+ * realistic.
  */
 import express, { NextFunction, Request, Response } from "express";
 import path from "path";
@@ -16,7 +16,7 @@ export function createApp(engine: Engine): express.Express {
   const app = express();
   app.use(express.json({ limit: "5mb" }));
 
-  // Ensure the demo merchant exists (mailbox not yet connected until OAuth).
+  // Ensure the demo merchant exists before OAuth connects the mailbox.
   if (!engine.getMerchant(DEMO_MERCHANT.id)) {
     engine.upsertMerchant({ ...DEMO_MERCHANT, mailbox_connected: false });
   }
@@ -27,10 +27,10 @@ export function createApp(engine: Engine): express.Express {
   const ok = (res: Response, data: unknown) => res.json({ ok: true, data });
   const fail = (res: Response, code: number, message: string) => res.status(code).json({ ok: false, error: message });
 
-  // --- health -------------------------------------------------------------
+  // Health
   app.get("/api/health", (_req, res) => ok(res, { status: "up", time: new Date().toISOString() }));
 
-  // --- §18.1 Auth (simulated OAuth onboarding, spec §6/§25) ---------------
+  // Auth (simulated OAuth onboarding, spec §6/§25)
   app.get("/api/auth/session", (req, res) => {
     const merchant = engine.getMerchant(merchantId(req));
     ok(res, { connected: merchant?.mailbox_connected ?? false, merchant });
@@ -54,10 +54,10 @@ export function createApp(engine: Engine): express.Express {
     ok(res, { disconnected: true });
   });
 
-  // --- §19 sync-cursor endpoint -------------------------------------------
+  // Sync cursor endpoint (§19)
   app.get("/api/mailbox/sync-cursor", (req, res) => ok(res, engine.getSyncCursor(merchantId(req))));
 
-  // --- onboarding initial scan (spec §6 step 6, §25 Scene 2) --------------
+  // Onboarding initial scan (spec §6 step 6, §25 Scene 2)
   app.post("/api/mailbox/scan", (req, res) => {
     const mid = merchantId(req);
     const merchant = engine.getMerchant(mid);
@@ -66,7 +66,7 @@ export function createApp(engine: Engine): express.Express {
     return ok(res, { scan: result, dashboard: engine.dashboard(mid) });
   });
 
-  // --- §18.4 manual resync / fallback sync --------------------------------
+  // Manual resync / fallback sync (§18.4)
   app.post("/api/mailbox/resync", (req, res) => {
     const mid = merchantId(req);
     const merchant = engine.getMerchant(mid);
@@ -75,7 +75,7 @@ export function createApp(engine: Engine): express.Express {
     return ok(res, { resync: result, dashboard: engine.dashboard(mid) });
   });
 
-  // --- processing-pipeline.plain process endpoint -------------------------
+  // Process endpoint from processing-pipeline.plain
   app.post("/api/jobs/process", (req, res) => {
     const mid = merchantId(req);
     const messages = req.body?.messages;
@@ -84,7 +84,7 @@ export function createApp(engine: Engine): express.Express {
     return ok(res, engine.process(mid, messages, merchant?.mail_provider ?? "gmail"));
   });
 
-  // --- §18.5 process a single message -------------------------------------
+  // Process a single message (§18.5)
   app.post("/api/jobs/process-message", (req, res) => {
     const mid = merchantId(req);
     const message = req.body?.message;
@@ -93,7 +93,7 @@ export function createApp(engine: Engine): express.Express {
     return ok(res, engine.process(mid, [message], merchant?.mail_provider ?? "gmail"));
   });
 
-  // --- §18.6 renew watches (stub — webhooks simulated for demo) ------------
+  // Renew watches (stub; webhooks are simulated for the demo)
   app.post("/api/jobs/renew-watches", (req, res) => {
     ok(res, {
       renewed: [],
@@ -102,10 +102,10 @@ export function createApp(engine: Engine): express.Express {
     });
   });
 
-  // --- §18.2 Gmail Pub/Sub webhook (simulated) ----------------------------
+  // Gmail Pub/Sub webhook (simulated, §18.2)
   app.post("/api/webhooks/gmail", (req, res) => {
     const mid = merchantId(req);
-    // Accept either a simulated {messages:[...]} body or a Pub/Sub-style push.
+    // Accept either a simulated {messages:[...]} body or a Pub/Sub push.
     let messages = req.body?.messages;
     if (!messages && req.body?.message?.data) {
       try {
@@ -116,16 +116,16 @@ export function createApp(engine: Engine): express.Express {
       }
     }
     if (!Array.isArray(messages) || messages.length === 0) {
-      // Acknowledge quickly even with nothing to do (spec §18.2).
+      // Acknowledge quickly even when there is nothing to do (§18.2).
       return res.status(200).json({ ok: true, data: { processed: 0, note: "ack" } });
     }
     const result = engine.process(mid, messages, "gmail");
     return res.status(200).json({ ok: true, data: result });
   });
 
-  // --- §18.3 Microsoft Graph webhook (simulated) --------------------------
+  // Microsoft Graph webhook (simulated, §18.3)
   app.post("/api/webhooks/outlook", (req, res) => {
-    // Respond to the Microsoft validation challenge (spec §18.3).
+    // Respond to the Microsoft validation challenge (§18.3).
     const validationToken = (req.query.validationToken as string) || (req.body?.validationToken as string);
     if (validationToken) return res.status(200).type("text/plain").send(validationToken);
 
@@ -138,7 +138,7 @@ export function createApp(engine: Engine): express.Express {
     return res.status(202).json({ ok: true, data: result });
   });
 
-  // --- read models for the dashboard (spec §16) ---------------------------
+  // Read models for the dashboard (§16)
   app.get("/api/dashboard", (req, res) => ok(res, engine.dashboard(merchantId(req))));
   app.get("/api/digest", (req, res) => ok(res, engine.digest(merchantId(req))));
   app.get("/api/vaults", (req, res) => ok(res, engine.listVaults(merchantId(req))));
@@ -152,7 +152,7 @@ export function createApp(engine: Engine): express.Express {
   app.get("/api/review-queue", (req, res) => ok(res, engine.listReviewQueue(merchantId(req))));
   app.get("/api/messages", (req, res) => ok(res, engine.listMessages(merchantId(req))));
 
-  // --- packs (spec §16.4) -------------------------------------------------
+  // Packs (§16.4)
   app.get("/api/packs", (req, res) => ok(res, engine.listPacks(merchantId(req))));
   app.get("/api/packs/:id", (req, res) => {
     const pack = engine.readPack(merchantId(req), req.params.id);
@@ -179,22 +179,22 @@ export function createApp(engine: Engine): express.Express {
     return ok(res, { billing_event: event, invoice: engine.invoice(merchantId(req)) });
   });
 
-  // --- billing (spec §23) -------------------------------------------------
+  // Billing (§23)
   app.get("/api/billing/events", (req, res) => ok(res, engine.listBilling(merchantId(req))));
   app.get("/api/billing/usage", (req, res) => ok(res, engine.usage(merchantId(req))));
   app.get("/api/billing/invoice", (req, res) => ok(res, engine.invoice(merchantId(req))));
   app.get("/api/billing/plans", (_req, res) => ok(res, engine.plans()));
 
-  // --- access log (spec §22) ----------------------------------------------
+  // Access log (§22)
   app.get("/api/access-log", (req, res) => ok(res, engine.listAccessLog(merchantId(req))));
 
-  // --- §22 delete all merchant data ---------------------------------------
+  // Delete all merchant data (§22)
   app.delete("/api/merchant/:id", (req, res) => {
     const deleted = engine.deleteMerchant(req.params.id);
     return ok(res, { deleted });
   });
 
-  // --- demo helpers -------------------------------------------------------
+  // Demo helpers
   app.post("/api/demo/reset", (_req, res) => {
     engine.deleteMerchant(DEMO_MERCHANT.id);
     engine.upsertMerchant({ ...DEMO_MERCHANT, mailbox_connected: false });
@@ -202,12 +202,12 @@ export function createApp(engine: Engine): express.Express {
   });
   app.get("/api/demo/seed-1048", (_req, res) => ok(res, order1048Mailbox()));
 
-  // --- static dashboard ---------------------------------------------------
+  // Static dashboard
   const webDir = path.resolve(__dirname, "..", "web");
   app.use(express.static(webDir));
   app.get("/", (_req, res) => res.sendFile(path.join(webDir, "index.html")));
 
-  // --- error handler ------------------------------------------------------
+  // Error handler
   app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
     // eslint-disable-next-line no-console
     console.error(err);
