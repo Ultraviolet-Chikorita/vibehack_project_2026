@@ -53,7 +53,41 @@ The iOS and Android companion app for fast review, built entirely with **BILT**.
 ## 🛠️ Built With Codeplain
 The web dashboard and mobile UI were built using **Codeplain**. The web dashboard's front end uses **V0** and is hosted on **Vercel**.
 
-## 🎨 Design System & UI Rules
+
+## Codeplain Deliverables
+
+Source of truth:
+
+- `codeplainfiles/app.plain` - integrated render entry point
+- `codeplainfiles/dispute-engine-core.plain` - shared concepts and data model
+- `codeplainfiles/email-filtering.plain` - inbox filtering and classification
+- `codeplainfiles/event-extraction.plain` - commerce event extraction
+- `codeplainfiles/evidence-vaults.plain` - vault creation and evidence storage
+- `codeplainfiles/evidence-scoring.plain` - evidence scoring and status labels
+- `codeplainfiles/dispute-detection.plain` - dispute signal detection
+- `codeplainfiles/pack-generation.plain` - evidence pack generation
+- `codeplainfiles/billing-metering.plain` - billing and outcome metering
+- `codeplainfiles/processing-pipeline.plain` - orchestration and sync pipeline
+- `codeplainfiles/READMEplain.md` - module notes and rendering guidance
+
+Packaged distribution:
+
+- `dist/codeplain/` - exportable bundle of the Codeplain specs
+- `dist/codeplain/app.plain` - packaged render entry point
+
+Render from source:
+
+```bash
+plain2code codeplainfiles/app.plain
+```
+
+Render from dist:
+
+```bash
+plain2code dist/codeplain/app.plain
+```
+
+### Design System & UI Rules
 
 The UI uses an **evidence ledger** aesthetic: precise, trustworthy, and paper-trail inspired.
 

@@ -1,0 +1,33 @@
+---
+description: 'Email filtering and classification — first-pass sender/subject filter and commerce classification (spec §9)'
+import:
+  - dispute-engine-core
+---
+
+***definitions***
+
+- :SenderAllowList: is the set of sender domains treated as commerce-relevant, such as shopify.com, stripe.com, paypal.com, royalmail.com, evri.com, dhl.com, ups.com, fedex.com, etsy.com, tiktok.com, and amazon.com.
+- :SubjectAllowList: is the set of subject phrases that mark a :SourceMessage: as commerce-relevant, such as "order confirmed", "payment received", "order fulfilled", "tracking number", "delivered", "refund request", "chargeback", "dispute opened", and "item not received".
+- :SubjectIgnoreList: is the set of subject phrases that mark a :SourceMessage: as irrelevant, such as "newsletter", "promotion", "discount", "marketing", "password reset", "login code", and "social media notification".
+
+***functional specs***
+
+- :App: should run a first-pass filter on each :SourceMessage: using :SenderAllowList: and :SubjectAllowList: to decide whether the message is commerce-relevant, before any expensive processing.
+
+  ***acceptance tests***
+
+  - A :SourceMessage: from "no-reply@shopify.com" with subject "Order #1048 confirmed" is marked relevant.
+  - A :SourceMessage: whose subject matches :SubjectIgnoreList: is marked irrelevant even when other terms are present.
+
+- :App: should store only minimal metadata for irrelevant messages and stop processing them.
+
+  ***acceptance tests***
+
+  - An irrelevant :SourceMessage: produces no :CommerceEvent: and no :OrderEvidenceVault:.
+
+- :App: should assign a :Classification: and a confidence between 0 and 1 to each relevant :SourceMessage:.
+
+  ***acceptance tests***
+
+  - A Shopify order confirmation is classified as order_confirmation with confidence of at least 0.8.
+  - A message :App: cannot confidently classify is assigned needs_review rather than guessed.

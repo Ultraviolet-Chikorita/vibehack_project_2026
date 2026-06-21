@@ -1,0 +1,26 @@
+---
+description: 'Evidence scoring — dispute-readiness score and status (spec §13)'
+import:
+  - dispute-engine-core
+---
+
+***functional specs***
+
+- :App: should compute an :EvidenceScore: for each :OrderEvidenceVault: from its evidence dimensions: order proof, payment proof, product proof, policy proof, fulfilment proof, delivery proof, address match, communication history, refund history, and conflict detection.
+
+  ***acceptance tests***
+
+  - A vault with order, payment, fulfilment, and delivery proof and a matching address scores at least 90.
+  - A vault missing delivery proof scores lower than an otherwise identical vault that has it.
+
+- :App: should assign a status label to each :OrderEvidenceVault:, one of: dispute_ready, mostly_ready, missing_delivery_proof, missing_policy_snapshot, missing_product_snapshot, needs_review, weak_evidence.
+
+  ***acceptance tests***
+
+  - A vault with :EvidenceScore: of at least 90 and no missing critical evidence is labelled dispute_ready.
+
+- :App: should report, for each :OrderEvidenceVault:, which evidence is missing, which is weak, and which is strongest.
+
+  ***acceptance tests***
+
+  - The score result lists missing and weak evidence explicitly so a :Merchant: can act on it before a dispute arrives.
