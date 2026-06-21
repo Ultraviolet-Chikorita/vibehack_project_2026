@@ -77,7 +77,7 @@ GitHub README pages do not reliably support embedded repo video players, so thes
 
 ### Demo 2
 
-[![Open Demo 2 video](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35_preview_small.gif)](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35_web.mp4)
+[![Open Demo 2 video](./Docs/video2_preview_small.gif)](./Docs/video2_web.mp4)
 
-[Download original Demo 2 `.mov`](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35.mov)
+[Download original Demo 2 `.mov`](./Docs/video2.mov)
 
