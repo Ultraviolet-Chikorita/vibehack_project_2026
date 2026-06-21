@@ -1,149 +1,66 @@
-
 # Settld
 
-Settld is a dispute-evidence platform for merchants. The repo now documents the two branch lines called out for this project:
+**Every order, dispute-ready.**
 
-- `feat/dispute-readiness-engine` — the Codeplain spec engine that defines the dispute-readiness backend.
-- `mobile_app` — the Next.js app build that turns the engine into a customer-facing web experience.
+Settld is a merchant dispute-evidence platform with a **Web Dashboard** and a **V1** mobile companion app. Built with **Codeplain**, it watches a merchant mailbox and turns order, payment, and shipping emails into evidence vaults.
 
-## `feat/dispute-readiness-engine`
+When a dispute appears, it prepares a response pack for review on the web or on the go.
 
-This branch is the source-of-truth spec set under `codeplainfiles/`. It defines a full dispute-readiness pipeline:
+## 🧠 How It Works
 
-- inbox filtering and commerce classification
-- structured event extraction
-- order evidence vault creation and linking
-- evidence scoring and status labels
-- dispute signal detection
-- evidence pack generation
-- billing and metering
-- pipeline orchestration and sync handling
+Settld runs in the background and turns a chaotic inbox into a structured evidence ledger.
 
-### Module map
-
-- `dispute-engine-core.plain` — shared concepts, data model, and cross-cutting requirements
-- `email-filtering.plain` — first-pass filtering and classification
-- `event-extraction.plain` — structured commerce event extraction
-- `evidence-vaults.plain` — vault creation, linking, and evidence storage
-- `evidence-scoring.plain` — evidence scoring and status labels
-- `dispute-detection.plain` — dispute signal detection and linking
-- `pack-generation.plain` — evidence pack generation
-- `billing-metering.plain` — usage and outcome metering
-- `processing-pipeline.plain` — sync contract and processing pipeline
-- `app.plain` — integrated render entry point
-
-### Render
-
-```bash
-plain2code codeplainfiles/app.plain
+```mermaid
+graph LR
+    A[Merchant Mailbox<br/>Gmail / Outlook] -->|Reads| B[Settld Scans & Classifies<br/>AI + Rules Engine]
+    B -->|Generates| C[Evidence Vault Built<br/>Per order, auto-linked]
+    C -->|Monitors| D[Dispute Detected<br/>Signal from inbox]
+    D -->|Drafts| E[Pack Generated<br/>Ready for review]
+    
+    style A fill:#e8f0fe,stroke:#4285f4,stroke-width:2px,color:#1B2430
+    style B fill:#e6f4ea,stroke:#34a853,stroke-width:2px,color:#1B2430
+    style C fill:#e6f4ea,stroke:#34a853,stroke-width:2px,color:#1B2430
+    style D fill:#fef7e0,stroke:#fbbc04,stroke-width:2px,color:#1B2430
+    style E fill:#e6f4ea,stroke:#34a853,stroke-width:2px,color:#1B2430
 ```
 
-Render modules individually while iterating, then render `app.plain` for the full system.
+## ⚖️ The Impact
 
-## `mobile_app`
+| BEFORE Settld | WITH Settld |
+| :--- | :--- |
+| ❌ Evidence scattered across inbox | ✅ Every order auto-evidenced |
+| ❌ Manual search takes hours | ✅ Dispute packs in seconds |
+| ❌ Deadlines missed | ✅ Beat every deadline |
+| ❌ Lost revenue | ✅ Recover revenue |
 
-This branch is the Next.js app build in `settld-app-build/`. It packages the dispute engine into a polished web app with:
+## 🏗️ Platform Architecture
 
-- a marketing landing page
-- a live dashboard
-- an orders list and per-order detail view
-- API routes for scan, seeding, vault reads, dashboard data, and pack generation
-- deterministic fallbacks when API or AI services are unavailable
+### 1. The Web Dashboard (Mission Control)
+The core web interface for merchants to manage evidence infrastructure, deep-dive disputes, and review analytics across connected mailboxes and stores.
 
-### App shape
+### 2. V1 Mobile Companion (On-the-Go)
+The iOS and Android companion app for fast review, built entirely with **BILT**.
+* **Quick-Log Shipment:** A 1-tap floating action button to log tracking details directly from the shipping counter.
+* **Push Notifications:** Instant alerts for approaching deadlines or new chargebacks.
+* **Fast Approvals:** Review and approve auto-generated evidence packs in seconds between customers.
 
-- `app/page.tsx` — landing page
-- `app/dashboard/page.tsx` — live dashboard
-- `app/orders/page.tsx` — orders list
-- `app/orders/[id]/page.tsx` — order detail view
-- `app/api/process/route.ts` — scan pipeline endpoint
-- `app/api/seed/route.ts` — seed vault rows
-- `app/api/vaults/route.ts` — read vault rows
-- `app/api/dashboard/route.ts` — dashboard payload
-- `app/api/generate-pack/route.ts` — evidence pack generation
+## 🎯 Core Features
 
-### Runtime behavior
+* **Automated Evidence Vaults:** Scans read-only mailboxes to compile timelines of order confirmations, tracking, and delivery proof.
+* **Dispute Signal Queue:** Alerts merchants to chargebacks or complaints with clear deadlines and evidence scores.
+* **Explicit Approval Flow:** Never auto-submits; every dispute response pack requires explicit human review.
 
-- `NEXT_PUBLIC_API_BASE` is optional.
-- When `NEXT_PUBLIC_API_BASE` is unset, the app runs locally on seed data.
-- When it is set, scans and pack generation call the configured backend.
-- `/api/generate-pack` uses the AI Gateway when available and falls back to deterministic output.
-- `/api/seed` and `/api/vaults` use Vercel Postgres.
+## 🛠️ Built With Codeplain
+The web dashboard and mobile UI were built using **Codeplain**. The web dashboard's front end uses **V0** and is hosted on **Vercel**.
 
-## Deployment instructions
+## 🎨 Design System & UI Rules
 
-### Codeplain engine
+The UI uses an **evidence ledger** aesthetic: precise, trustworthy, and paper-trail inspired.
 
-1. Keep working from the repository root.
-2. Render the spec entry point:
-
-```bash
-plain2code codeplainfiles/app.plain
-```
-
-### Next.js app
-
-1. Change into the app directory:
-
-```bash
-cd settld-app-build
-```
-
-2. Install dependencies:
-
-```bash
-pnpm install
-```
-
-3. Run locally:
-
-```bash
-pnpm dev
-```
-
-4. Build for production:
-
-```bash
-pnpm build
-```
-
-5. Start the production server:
-
-```bash
-pnpm start
-```
-
-### Production notes
-
-- Deploy the Next app on Vercel or another Next.js host.
-- Enable Vercel Postgres for the vault routes.
-- Set `NEXT_PUBLIC_API_BASE` when the app should call an external backend instead of local seed data.
-- Keep the AI Gateway available if you want live pack drafting; otherwise the deterministic fallback still works.
-
-## Traction data images
-
-These are placeholder slots for project traction screenshots or charts.
-
-- ![Traction chart 1](./docs/traction/traction-01.png)
-- ![Traction chart 2](./docs/traction/traction-02.png)
-- ![Traction chart 3](./docs/traction/traction-03.png)
-- ![Traction chart 4](./docs/traction/traction-04.png)
-
-## Demo videos
-
-GitHub README pages do not reliably support embedded repo video players, so these are compact animated previews that display inline and link to lightweight `.mp4` versions.
-
-### Demo 1
-
-[![Open Demo 1 video](./Docs/IMG_0346_preview_small.gif)](./Docs/IMG_0346_web.mp4)
-
-[Download original Demo 1 `.mov`](./Docs/IMG_0346.mov)
-
-### Demo 2
-
-[![Open Demo 2 video](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35_preview_small.gif)](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35_web.mp4)
-
-[Download original Demo 2 `.mov`](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35.mov)
-
-
-
+* **Typography:** Serif display face (Fraunces) for headings, clean sans-serif (Inter) for UI, and monospace (IBM Plex Mono) for identifiers.
+* **Visuals:** Card-based layouts, 1px hairline borders, small border radii (2–4px), and simple line icons.
+* **Colors:** Paper backgrounds (`#F7F3EA`), primary ink (`#1B2430`), and distinct status indicators (Green: `#2F6F4E`, Amber: `#C98A3A`, Red: `#A4402A`).
+* **Hard Scope Rules:**
+  * **No Auto-Actions:** Every outbound action requires a deliberate human tap and confirmation state.
+  * **Visible Scoring:** Evidence scores (e.g., "92/100") must be visibly attached to all status labels.
+  * **Not an Email Client:** Read/review/approve only. No compose or inbox browsing functionality.
