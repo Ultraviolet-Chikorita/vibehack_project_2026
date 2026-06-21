@@ -130,9 +130,24 @@ These are placeholder slots for project traction screenshots or charts.
 - ![Traction chart 4](./docs/traction/traction-04.png)
 
 ## Demo videos
-- ![](.\#/Docs/IMG_0346.mov)
 
-https://github.com/Ultraviolet-Chikorita/vibehack_project_2026/blob/main/Docs/Screen%20Recording%202026-06-20%20at%2019.50.35.mov
+GitHub does not always render `.mov` files inline in a repository README, so each demo is included with an inline player attempt plus a direct file link.
+
+### Demo 1
+
+<video src="./Docs/IMG_0346.mov" controls muted playsinline width="720">
+  Your browser does not support embedded video playback.
+</video>
+
+[Open Demo 1 video](./Docs/IMG_0346.mov)
+
+### Demo 2
+
+<video src="./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35.mov" controls muted playsinline width="720">
+  Your browser does not support embedded video playback.
+</video>
+
+[Open Demo 2 video](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35.mov)
 
 
 
