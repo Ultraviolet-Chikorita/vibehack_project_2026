@@ -1,0 +1,4 @@
+verbose: true
+copy-build: true
+build-folder: plain_modules
+build-dest: build

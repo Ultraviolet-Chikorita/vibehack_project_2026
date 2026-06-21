@@ -74,6 +74,7 @@ Packaged distribution:
 
 - `dist/codeplain/` - exportable bundle of the Codeplain specs
 - `dist/codeplain/app.plain` - packaged render entry point
+- `dist/codeplain/config.yaml` - packaged Codeplain CLI config
 
 Render from source:
 
@@ -86,6 +87,8 @@ Render from dist:
 ```bash
 plain2code dist/codeplain/app.plain
 ```
+
+The bundled `config.yaml` keeps Codeplain's render output in `build/` so generated code does not collide with the packaged specs inside `dist/codeplain/`.
 
 ### Design System & UI Rules
 
