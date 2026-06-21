@@ -64,3 +64,20 @@ The UI uses an **evidence ledger** aesthetic: precise, trustworthy, and paper-tr
   * **No Auto-Actions:** Every outbound action requires a deliberate human tap and confirmation state.
   * **Visible Scoring:** Evidence scores (e.g., "92/100") must be visibly attached to all status labels.
   * **Not an Email Client:** Read/review/approve only. No compose or inbox browsing functionality.
+ 
+* ## Demo videos
+
+GitHub README pages do not reliably support embedded repo video players, so these are compact animated previews that display inline and link to lightweight `.mp4` versions.
+
+### Demo 1
+
+[![Open Demo 1 video](./Docs/IMG_0346_preview_small.gif)](./Docs/IMG_0346_web.mp4)
+
+[Download original Demo 1 `.mov`](./Docs/IMG_0346.mov)
+
+### Demo 2
+
+[![Open Demo 2 video](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35_preview_small.gif)](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35_web.mp4)
+
+[Download original Demo 2 `.mov`](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35.mov)
+
