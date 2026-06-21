@@ -65,9 +65,7 @@ The UI uses an **evidence ledger** aesthetic: precise, trustworthy, and paper-tr
   * **Visible Scoring:** Evidence scores (e.g., "92/100") must be visibly attached to all status labels.
   * **Not an Email Client:** Read/review/approve only. No compose or inbox browsing functionality.
  
-* ## Demo videos
-
-GitHub README pages do not reliably support embedded repo video players, so these are compact animated previews that display inline and link to lightweight `.mp4` versions.
+ ## Demo videos
 
 ### Demo 1
 
