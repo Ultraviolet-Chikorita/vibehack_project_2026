@@ -65,6 +65,13 @@ The UI uses an **evidence ledger** aesthetic: precise, trustworthy, and paper-tr
   * **Visible Scoring:** Evidence scores (e.g., "92/100") must be visibly attached to all status labels.
   * **Not an Email Client:** Read/review/approve only. No compose or inbox browsing functionality.
  
+## **market signal** ## 
+
+<img width="641" height="379" alt="image" src="https://github.com/user-attachments/assets/b625f43a-b586-4d4d-8241-9abd364df563" />
+
+
+
+ 
  ## Demo videos
 
 ### Demo 1
