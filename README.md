@@ -131,17 +131,17 @@ These are placeholder slots for project traction screenshots or charts.
 
 ## Demo videos
 
-GitHub README pages do not reliably support embedded repo video players, so the most dependable setup is clickable preview images that open lightweight `.mp4` versions.
+GitHub README pages do not reliably support embedded repo video players, so these are compact animated previews that display inline and link to lightweight `.mp4` versions.
 
 ### Demo 1
 
-[![Open Demo 1 video](./Docs/IMG_0346_poster.jpg)](./Docs/IMG_0346_web.mp4)
+[![Open Demo 1 video](./Docs/IMG_0346_preview_small.gif)](./Docs/IMG_0346_web.mp4)
 
 [Download original Demo 1 `.mov`](./Docs/IMG_0346.mov)
 
 ### Demo 2
 
-[![Open Demo 2 video](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35_poster.jpg)](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35_web.mp4)
+[![Open Demo 2 video](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35_preview_small.gif)](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35_web.mp4)
 
 [Download original Demo 2 `.mov`](./Docs/Screen%20Recording%202026-06-20%20at%2019.50.35.mov)
 
