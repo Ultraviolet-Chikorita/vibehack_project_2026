@@ -99,9 +99,23 @@ The UI uses an **evidence ledger** aesthetic: precise, trustworthy, and paper-tr
   * **Visible Scoring:** Evidence scores (e.g., "92/100") must be visibly attached to all status labels.
   * **Not an Email Client:** Read/review/approve only. No compose or inbox browsing functionality.
  
-* ## Demo videos
+## **market signal** ## 
 
-GitHub README pages do not reliably support embedded repo video players, so these are compact animated previews that display inline and link to lightweight `.mp4` versions.
+To validate the core problem, we conducted an informal in-person survey of ~100 people across central London and Shoreditch, asking about their experience and hesitations buying from independent sellers on platforms like Etsy and eBay.
+
+Key findings:
+93% want faster refunds when asked directly "Would you want faster refunds?" (7% said no).
+The two most commonly cited reasons for not buying more often from independent/Etsy sellers were:
+
+Slow/late refunds — uncertainty or long wait times when something goes wrong
+Lack of buyer security — less confidence in dispute resolution compared to larger platforms (e.g. Amazon)
+
+<img width="641" height="379" alt="image" src="https://github.com/user-attachments/assets/b625f43a-b586-4d4d-8241-9abd364df563" />
+
+
+
+ 
+ ## Demo videos
 
 ### Demo 1
 
