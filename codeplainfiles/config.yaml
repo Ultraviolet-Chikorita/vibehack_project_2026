@@ -1,0 +1,21 @@
+build-dest: "./dist"
+build-folder: "./codeplainfiles"
+copy-build: true
+
+entry: "app.plain"
+
+modules:
+  - dispute-engine-core
+  - email-filtering
+  - event-extraction
+  - evidence-vaults
+  - evidence-scoring
+  - dispute-detection
+  - pack-generation
+  - billing-metering
+  - processing-pipeline
+  - app
+
+logging:
+  file-logging: true
+  log-file: "codeplain.log"
