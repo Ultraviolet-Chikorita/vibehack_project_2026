@@ -67,6 +67,15 @@ The UI uses an **evidence ledger** aesthetic: precise, trustworthy, and paper-tr
  
 ## **market signal** ## 
 
+To validate the core problem, we conducted an informal in-person survey of ~100 people across central London and Shoreditch, asking about their experience and hesitations buying from independent sellers on platforms like Etsy and eBay.
+
+Key findings:
+93% want faster refunds when asked directly "Would you want faster refunds?" (7% said no).
+The two most commonly cited reasons for not buying more often from independent/Etsy sellers were:
+
+Slow/late refunds — uncertainty or long wait times when something goes wrong
+Lack of buyer security — less confidence in dispute resolution compared to larger platforms (e.g. Amazon)
+
 <img width="641" height="379" alt="image" src="https://github.com/user-attachments/assets/b625f43a-b586-4d4d-8241-9abd364df563" />
 
 
